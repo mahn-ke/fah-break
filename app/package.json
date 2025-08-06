@@ -1,0 +1,6 @@
+{
+    "name": "fah-break",
+    "scripts": {
+        "start": "node main.js"
+    }
+}
