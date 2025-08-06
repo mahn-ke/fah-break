@@ -1,0 +1,15 @@
+name: Deploy service, generate certificates, and update NGINX configuration
+
+on:
+  push:
+    branches: [ "main" ]
+  workflow_dispatch:
+
+concurrency:
+  group: deploy-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  deploy:
+    uses: mahn-ke/.github/.github/workflows/template.yml@main
+    secrets: inherit
