@@ -11,5 +11,5 @@ concurrency:
 
 jobs:
   backup:
-    uses: mahn-ke/.github/.github/workflows/backup.yml@main
+    uses: mahn-ke/.github/.github/workflows/template-backup.yml@main
     secrets: inherit
