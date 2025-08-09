@@ -11,5 +11,5 @@ concurrency:
 
 jobs:
   deploy:
-    uses: mahn-ke/.github/.github/workflows/template.yml@main
+    uses: mahn-ke/.github/.github/workflows/template-deploy.yml@main
     secrets: inherit
