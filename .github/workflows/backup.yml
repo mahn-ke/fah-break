@@ -1,8 +1,6 @@
 name: Backup volumes from docker-compose.yml
 
 on:
-  schedule:
-    - cron: '0 0 * * *' # daily at 0:00
   workflow_dispatch:
 
 concurrency:
