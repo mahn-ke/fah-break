@@ -2,6 +2,7 @@ import fs from 'fs';
 import WebSocket from 'ws';
 import readline from 'readline';
 
+let lastAccessAt = null;
 async function getLastDashboardAccess(logPath, maxLines = 100) {
     const lines = [];
     const fileStream = fs.createReadStream(logPath, { encoding: 'utf8' });
@@ -21,19 +22,19 @@ async function getLastDashboardAccess(logPath, maxLines = 100) {
     for (let i = lines.length - 1; i >= 0; i--) {
         const tsStr = parseLogLine(lines[i]);
         if (tsStr) {
-            return parseTimestamp(tsStr);
+            const timeStamp = parseTimestamp(tsStr);
+            lastAccessAt = timeStamp;
+            return lastAccessAt;
         }
     }
 
-    return null;
+    return lastAccessAt;
 }
 
 
 const LOG_PATH = '/mnt/nginx-logs/access.log';
 const CHECK_INTERVAL = 30 * 1000; // 30 seconds
 const UNPAUSE_THRESHOLD = 30 * 60 * 1000; // 30 minutes
-
-let lastDashboardTimestamp = null;
 
 function parseLogLine(line) {
     // Example:
@@ -99,24 +100,22 @@ async function checkDashboardAccess() {
     try {
         const latestTimestamp = await getLastDashboardAccess(LOG_PATH);
 
-        if (latestTimestamp) {
-            lastDashboardTimestamp = latestTimestamp;
-            console.log(`Dashboard accessed at: ${latestTimestamp}, pausing FAHClient.`);
-        } else {
+        if (!latestTimestamp) {
             console.log(`Dashboard not accessed`);
             await sendWs("fold");
+            return;
+        } 
+        console.log(`Dashboard last accessed at: ${latestTimestamp}`);
+
+        const now = new Date();
+        if (now - latestTimestamp > UNPAUSE_THRESHOLD) {
+            console.log(`No dashboard access for over 30 minutes, unpausing FAHClient.`);
+            await sendWs("fold");
+            return;
         }
-        if (lastDashboardTimestamp) {
-            const now = new Date();
-            if (now - lastDashboardTimestamp > UNPAUSE_THRESHOLD) {
-                console.log(`No dashboard access for over 30 minutes, unpausing FAHClient.`);
-                await sendWs("fold");
-                lastDashboardTimestamp = null; // Prevent repeated unpausing
-            } else {
-                console.log(`Dashboard was accessed recently, keeping FAHClient paused; last access at: ${lastDashboardTimestamp}`);
-                await sendWs("pause");
-            }
-        }
+
+        console.log(`Dashboard was accessed within last 30 minutes, pausing FAHClient`);
+        await sendWs("pause");
     } catch (err) {
         console.error(err);
     }
