@@ -5,4 +5,4 @@ services:
     image: ghcr.io/mahn-ke/fah-break:latest
     restart: unless-stopped
     volumes:
-      - ${NGINX_ROOT}/logs:/mnt/nginx-logs
+      - ${NGINX_HOME}/logs:/mnt/nginx-logs
