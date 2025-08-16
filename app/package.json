@@ -1,6 +1,10 @@
 {
     "name": "fah-break",
+    "type": "module",
     "scripts": {
         "start": "node main.js"
+    },
+    "dependencies": {
+        "ws": "^8.18.3"
     }
 }
