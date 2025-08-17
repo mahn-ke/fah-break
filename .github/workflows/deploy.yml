@@ -7,7 +7,7 @@ name: Deploy service, generate certificates, and update NGINX configuration
 on:
   push:
     branches: [ "main" ]
-  pull_requests:
+  pull_request:
   workflow_dispatch:
 
 concurrency:
