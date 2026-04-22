@@ -37,13 +37,29 @@ const CHECK_INTERVAL = 30 * 1000; // 30 seconds
 const UNPAUSE_THRESHOLD = 30 * 60 * 1000; // 30 minutes
 
 function parseLogLine(line) {
-    // Example:
+    // Break on paperless requests
     // 91.67.124.93 - - [16/Jul/2025:19:58:45 +0200]  200 "GET /dashboard HTTP/1.1" 1752 "https://paperless.by.vincent.mahn.ke/..." "UserAgent" "-"
     const timestampWithQueryRegex = /\[(.*)\].*paperless\.by\.vincent\.mahn\.ke\/dashboard/;
     const match = line.match(timestampWithQueryRegex);
     if (match) {
         return match[1];
     }
+    // Break on Nextcloud Android requests
+    // 91.67.124.93 - 58fedbd722dd85d1160332c4b8055fcf74f3b203615e3c5a0019f2d84c8e49a3 [22/Apr/2026:20:48:56 +0200]  200 "GET /status.php HTTP/1.1" 171 "-" "Mozilla/5.0 (Android) Nextcloud-android/33.0.1" "-"
+    const timestampWithMobileNextcloudRegex = /\[([^\]]+)\].*5\.0 \(Android\) Nextcloud-android/;
+    const mobileNextcloudMatch = line.match(timestampWithMobileNextcloudRegex);
+    if (mobileNextcloudMatch) {
+        return mobileNextcloudMatch[1];
+    }
+
+    // Break on Nextcloud Web requests
+    // 91.67.124.93 - - [22/Apr/2026:20:48:44 +0200]  200 "GET /apps/dashboard/ HTTP/2.0" 14745 "-" "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/145.0.0.0 Safari/537.36 OPR/129.0.0.0" "-"
+    const timestampWithDesktopNextcloudRegex = /\[([^\]]+)\].*apps\/dashboard/;
+    const desktopNextcloudMatch = line.match(timestampWithDesktopNextcloudRegex);
+    if (desktopNextcloudMatch) {
+        return desktopNextcloudMatch[1];
+    }
+
     return null;
 }
 
