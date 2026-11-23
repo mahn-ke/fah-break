@@ -2,7 +2,7 @@ version: "3.8"
 
 services:
   app:
-    image: ghcr.io/mahn-ke/fah-break:latest@sha256:bfcbc4a8da52375438c7b4e388b46a74189e87d3cb58b7b1d0036cad7fec2afa
+    image: ghcr.io/mahn-ke/fah-break:latest@sha256:0b01380176a7e68de3b685a7252a4c2ff790cb4be9ebad57e4f3e4d33e9d6d35
     restart: unless-stopped
     volumes:
       - ${NGINX_HOME}/logs:/mnt/nginx-logs
